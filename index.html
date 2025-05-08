@@ -89,7 +89,26 @@
     <label for="baseAmount">Въведи сума</label>
     <input type="number" id="baseAmount" oninput="calculatePercent()">
     <div id="percentResults" class="output"></div>
-  </div>
+  </div><!-- Отстъпка / Надценка -->
+<div style="margin-top: 30px;">
+  <button onclick="copyResults('discountResult')">Копирай</button>
+  <button onclick="clearField('discountBase', 'discountResult')">Изтрий</button>
+
+  <label for="discountBase">Въведи сума</label>
+  <input type="number" id="discountBase" oninput="calculateDiscount()">
+
+  <label for="discountPercent">Процент</label>
+  <input type="number" id="discountPercent" value="10" oninput="calculateDiscount()">
+
+  <label for="discountType">Тип</label>
+  <select id="discountType" onchange="calculateDiscount()">
+    <option value="plus">+ Надценка</option>
+    <option value="minus">- Отстъпка</option>
+  </select>
+
+  <div class="output" id="discountResult"></div>
+</div>
+
 
   <!-- ДДС Калкулатор -->
   <div id="section-vat" class="section">
@@ -107,28 +126,6 @@
     <input type="number" id="vatOnly" oninput="calculateFromVATOnly()">
     <div class="output" id="outputVATOnly"></div>
   </div>
-  <!-- Отстъпка / Надценка -->
-<div id="discountSection" style="margin-top: 30px;">
-  <button onclick="copyResults('discountResult')">Копирай</button>
-  <button onclick="clearField('discountBase', 'discountResult')">Изтрий</button>
-
-  <label for="discountBase">Въведи сума</label>
-  <input type="number" id="discountBase">
-
-  <label for="discountPercent">Процент</label>
-  <input type="number" id="discountPercent" value="10">
-
-  <label for="discountType">Тип</label>
-  <select id="discountType">
-    <option value="plus">+ Надценка</option>
-    <option value="minus">- Отстъпка</option>
-  </select>
-
-  <button onclick="calculateDiscount()">Изчисли</button>
-
-  <div class="output" id="discountResult"></div>
-</div>
-
 
   <footer>by Dimitar Kolev</footer>
 
