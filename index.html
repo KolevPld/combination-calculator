@@ -4,78 +4,91 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Калкулатор</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root { color-scheme: dark; }
     body {
       background: #121212;
       color: #ffffff;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0; padding: 1rem;
-      max-width: 380px; margin: auto;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 1rem;
+      max-width: 380px;
+      margin: auto;
     }
     h1 {
-      font-size: 20px;
+      font-size: 22px;
       text-align: center;
       margin-bottom: 1rem;
       color: #4CAF50;
       border-bottom: 1px solid #333;
-      padding-bottom: 5px;
+      padding-bottom: 8px;
+      text-shadow: 0 0 5px #4caf50a1;
     }
     .tabs {
       display: flex;
       gap: 4px;
-      margin-bottom: 1rem;
+      margin-bottom: 1.2rem;
     }
     .tabs button {
       flex: 1;
-      padding: 0.5rem;
+      padding: 0.6rem;
       font-size: 13px;
-      background: #1e1e1e;
+      background: linear-gradient(to right, #1e1e1e, #2a2a2a);
       color: #fff;
       border: 1px solid #444;
-      border-radius: 6px;
-      transition: 0.2s;
+      border-radius: 10px;
+      transition: 0.3s ease;
+      box-shadow: 0 0 4px #00000055;
     }
     .tabs button:hover {
-      background: #292929;
+      background: #333;
     }
     .tabs button.active {
-      background: #333;
-      font-weight: bold;
-      border-color: #666;
+      border-bottom: 3px solid #4CAF50;
+      font-weight: 600;
     }
-    .section { display: none; }
-    .section.active { display: block; }
+    .section {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .section.active {
+      display: block;
+      opacity: 1;
+    }
     label {
       font-size: 13px;
-      font-weight: bold;
-      margin-top: 0.9rem;
+      font-weight: 600;
+      margin-top: 1rem;
       display: block;
-      color: #ffffff;
+      color: #eeeeee;
     }
     input, select {
       width: 95%;
-      padding: 6px 10px;
-      margin-top: 4px;
+      padding: 8px 12px;
+      margin-top: 6px;
       font-size: 13px;
       background: #ffffff;
       color: #000;
       border: 1px solid #4CAF50;
-      border-radius: 6px;
+      border-radius: 10px;
       outline: none;
       transition: 0.2s;
+      box-shadow: 0 0 4px #4caf5025;
     }
     input:focus, select:focus {
       border-color: #66bb6a;
-      box-shadow: 0 0 0 1px #66bb6a;
+      box-shadow: 0 0 6px #66bb6a88;
     }
     .output {
-      margin-top: 0.7rem;
-      padding: 8px;
+      margin-top: 0.9rem;
+      padding: 10px;
       font-size: 13px;
       background: #2a2a2a;
       border-left: 4px solid #4CAF50;
-      border-radius: 5px;
+      border-radius: 8px;
+      box-shadow: 0 0 6px #4caf5040;
     }
     footer {
       text-align: center;
@@ -87,16 +100,17 @@
 </head>
 <body>
 <h1>Комбиниран Калкулатор</h1>
+
 <div class="tabs">
-  <button id="tab-percent" class="active" onclick="show('percent')">Проценти</button>
-  <button id="tab-vat" onclick="show('vat')">ДДС</button>
-  <button id="tab-currency" onclick="show('currency')">Валута</button>
+  <button id="tab-percent" class="active" onclick="show('percent')">📈 Проценти</button>
+  <button id="tab-vat" onclick="show('vat')">📊 ДДС</button>
+  <button id="tab-currency" onclick="show('currency')">💱 Валута</button>
 </div>
 
 <div id="percent" class="section active">
-  <label>Сума (отстъпка/надценка)</label>
+  <label>💰 Сума (отстъпка/надценка)</label>
   <input type="number" id="percentBase" oninput="calcPercent()"/>
-  <label>Процент</label>
+  <label>📉 Процент</label>
   <input type="number" id="percentValue" oninput="calcPercent()"/>
   <select id="percentType" onchange="calcPercent()">
     <option value="plus">+ Надценка</option>
@@ -106,21 +120,21 @@
 </div>
 
 <div id="vat" class="section">
-  <label>Сума с ДДС (20%)</label>
+  <label>💸 Сума с ДДС (20%)</label>
   <input type="number" id="vatGross" oninput="calcVatGross()"/>
   <div id="vatGrossRes" class="output"></div>
-  <label>Сума без ДДС (20%)</label>
+  <label>🏷️ Сума без ДДС (20%)</label>
   <input type="number" id="vatNet" oninput="calcVatNet()"/>
   <div id="vatNetRes" class="output"></div>
-  <label>Само ДДС (20%)</label>
+  <label>📦 Само ДДС (20%)</label>
   <input type="number" id="vatOnly" oninput="calcVatOnly()"/>
   <div id="vatOnlyRes" class="output"></div>
 </div>
 
 <div id="currency" class="section">
-  <label>Лева (BGN)</label>
+  <label>🇧🇬 Лева (BGN)</label>
   <input type="number" id="bgn" oninput="convCur('bgn')"/>
-  <label>Евро (EUR)</label>
+  <label>🇪🇺 Евро (EUR)</label>
   <input type="number" id="eur" oninput="convCur('eur')"/>
   <div class="output">Курс: 1 EUR = 1.95583 BGN</div>
 </div>
@@ -129,11 +143,16 @@
 
 <script>
 function show(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
   document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  document.getElementById(id).style.display = 'block';
+  setTimeout(() => document.getElementById(id).classList.add('active'), 20);
   document.getElementById('tab-' + id).classList.add('active');
 }
+
 function calcPercent() {
   const base = parseFloat(document.getElementById('percentBase').value) || 0;
   const pct = parseFloat(document.getElementById('percentValue').value) || 0;
@@ -143,6 +162,7 @@ function calcPercent() {
   document.getElementById('percentOutput').innerHTML =
     `Нова сума: ${result.toFixed(2)} лв<br>Разлика: ${diff.toFixed(2)} лв`;
 }
+
 function calcVatGross() {
   const v = parseFloat(document.getElementById('vatGross').value) || 0;
   const net20 = (v / 1.2).toFixed(2);
@@ -150,6 +170,7 @@ function calcVatGross() {
   document.getElementById('vatGrossRes').innerHTML =
     `Нетна сума: ${net20} лв<br>ДДС (20%): ${vat20} лв`;
 }
+
 function calcVatNet() {
   const n = parseFloat(document.getElementById('vatNet').value) || 0;
   const gross20 = (n * 1.2).toFixed(2);
@@ -157,6 +178,7 @@ function calcVatNet() {
   document.getElementById('vatNetRes').innerHTML =
     `С ДДС: ${gross20} лв<br>ДДС (20%): ${vat20} лв`;
 }
+
 function calcVatOnly() {
   const d = parseFloat(document.getElementById('vatOnly').value) || 0;
   const net20 = (d / 0.2).toFixed(2);
@@ -164,6 +186,7 @@ function calcVatOnly() {
   document.getElementById('vatOnlyRes').innerHTML =
     `Нетна сума: ${net20} лв<br>Общо с ДДС: ${gross20} лв`;
 }
+
 function convCur(src) {
   const rate = 1.95583;
   const b = document.getElementById('bgn');
