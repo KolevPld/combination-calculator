@@ -37,25 +37,22 @@
     .tabs {
       display: flex;
       gap: 4px;
-      margin-bottom: 1.2rem;
+      margin-bottom: 1rem;
+      position: relative;
     }
     .tabs button {
       flex: 1;
       padding: 0.6rem;
       font-size: 13px;
-      background: linear-gradient(to right, #1e1e1e, #2a2a2a);
+      background: transparent;
       color: #fff;
-      border: 1px solid #444;
-      border-radius: 10px;
+      border: none;
+      border-bottom: 2px solid transparent;
       transition: 0.3s ease;
-      box-shadow: 0 0 4px #00000055;
-    }
-    .tabs button:hover {
-      background: #333;
     }
     .tabs button.active {
-      border-bottom: 3px solid #4CAF50;
-      font-weight: 600;
+      border-color: #4CAF50;
+      font-weight: bold;
     }
     .section {
       display: none;
@@ -66,32 +63,40 @@
       display: block;
       opacity: 1;
     }
-    label {
-      font-size: 13px;
-      font-weight: 600;
-      margin-top: 1rem;
-      display: block;
-      color: #eeeeee;
+    .field {
+      position: relative;
+      margin-top: 1.5rem;
     }
-    input, select {
-      width: 95%;
-      padding: 8px 12px;
-      margin-top: 6px;
+    .field input, .field select {
+      width: 100%;
+      padding: 10px;
       font-size: 13px;
-      background: #ffffff;
-      color: #000;
-      border: 1px solid #4CAF50;
-      border-radius: 10px;
+      background: transparent;
+      color: #fff;
+      border: none;
+      border-bottom: 1px solid #4CAF50;
       outline: none;
-      transition: 0.2s;
-      box-shadow: 0 0 4px #4caf5025;
     }
-    input:focus, select:focus {
-      border-color: #66bb6a;
-      box-shadow: 0 0 6px #66bb6a88;
+    .field label {
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      font-size: 13px;
+      color: #aaa;
+      pointer-events: none;
+      transition: 0.3s ease;
+    }
+    .field input:focus + label,
+    .field input:not(:placeholder-shown) + label,
+    .field select:focus + label,
+    .field select:not([value=""]) + label {
+      top: -10px;
+      font-size: 11px;
+      color: #4CAF50;
     }
     .output {
-      margin-top: 0.9rem;
+      margin-top: 1rem;
       padding: 10px;
       font-size: 13px;
       background: #2a2a2a;
@@ -109,7 +114,6 @@
 </head>
 <body>
 <h1>Комбиниран Калкулатор</h1>
-
 <div class="tabs">
   <button id="tab-percent" class="active" onclick="show('percent')">📈 Проценти</button>
   <button id="tab-vat" onclick="show('vat')">📊 ДДС</button>
@@ -117,34 +121,51 @@
 </div>
 
 <div id="percent" class="section active">
-  <label>💰 Сума (отстъпка/надценка)</label>
-  <input type="number" id="percentBase" oninput="calcPercent()"/>
-  <label>📉 Процент</label>
-  <input type="number" id="percentValue" oninput="calcPercent()"/>
-  <select id="percentType" onchange="calcPercent()">
-    <option value="plus">+ Надценка</option>
-    <option value="minus">– Отстъпка</option>
-  </select>
+  <div class="field">
+    <input type="number" id="percentBase" oninput="calcPercent()" placeholder=" " />
+    <label>Сума (отстъпка/надценка)</label>
+  </div>
+  <div class="field">
+    <input type="number" id="percentValue" oninput="calcPercent()" placeholder=" " />
+    <label>Процент</label>
+  </div>
+  <div class="field">
+    <select id="percentType" onchange="calcPercent()" value="">
+      <option value="" disabled selected hidden></option>
+      <option value="plus">+ Надценка</option>
+      <option value="minus">– Отстъпка</option>
+    </select>
+    <label>Тип</label>
+  </div>
   <div id="percentOutput" class="output"></div>
 </div>
-
 <div id="vat" class="section">
-  <label>💸 Сума с ДДС (20%)</label>
-  <input type="number" id="vatGross" oninput="calcVatGross()"/>
+  <div class="field">
+    <input type="number" id="vatGross" oninput="calcVatGross()" placeholder=" " />
+    <label>Сума с ДДС (20%)</label>
+  </div>
   <div id="vatGrossRes" class="output"></div>
-  <label>🏷️ Сума без ДДС (20%)</label>
-  <input type="number" id="vatNet" oninput="calcVatNet()"/>
+  <div class="field">
+    <input type="number" id="vatNet" oninput="calcVatNet()" placeholder=" " />
+    <label>Сума без ДДС (20%)</label>
+  </div>
   <div id="vatNetRes" class="output"></div>
-  <label>📦 Само ДДС (20%)</label>
-  <input type="number" id="vatOnly" oninput="calcVatOnly()"/>
+  <div class="field">
+    <input type="number" id="vatOnly" oninput="calcVatOnly()" placeholder=" " />
+    <label>Само ДДС (20%)</label>
+  </div>
   <div id="vatOnlyRes" class="output"></div>
 </div>
 
 <div id="currency" class="section">
-  <label>🇧🇬 Лева (BGN)</label>
-  <input type="number" id="bgn" oninput="convCur('bgn')"/>
-  <label>🇪🇺 Евро (EUR)</label>
-  <input type="number" id="eur" oninput="convCur('eur')"/>
+  <div class="field">
+    <input type="number" id="bgn" oninput="convCur('bgn')" placeholder=" " />
+    <label>Лева (BGN)</label>
+  </div>
+  <div class="field">
+    <input type="number" id="eur" oninput="convCur('eur')" placeholder=" " />
+    <label>Евро (EUR)</label>
+  </div>
   <div class="output">Курс: 1 EUR = 1.95583 BGN</div>
 </div>
 
