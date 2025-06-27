@@ -1,121 +1,125 @@
 <!DOCTYPE html>
 <html lang="bg">
 <head>
-<meta charset="UTF-8">
-<title>Калкулатор – Надценка/Отстъпка</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Комбиниран Калкулатор</title>
 <style>
-  :root {
-    --bg: #fff;
-    --text: #000;
-    --card: #f9f9f9;
-    --success: #0b8;
-    --warning: #d33;
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #121212;
-      --text: #eee;
-      --card: #1e1e1e;
-    }
-  }
-  body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 1rem; }
-  .card { background: var(--card); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
-  .row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
-  input, select { padding: 0.5rem; font-size: 1rem; }
-  button { padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; }
-  .output { font-weight: bold; margin-top: 0.5rem; }
-  .output.success { color: var(--success); }
-  .output.warning { color: var(--warning); }
-  .history { font-size: 0.9rem; margin-top: 1rem; }
-  .history-item { border-top: 1px solid #ccc; padding: 0.5rem 0; }
+  h1 { text-align: center; margin-bottom: 20px; }
+  .tabs { display: flex; justify-content: space-around; margin-bottom: 20px; }
+  .tabs button { flex: 1; padding: 10px; margin: 0 5px; cursor: pointer; }
+  .tabs button.active { background-color: #e0e0e0; font-weight: bold; }
+  .section { display: none; }
+  .section.active { display: block; }
+  label { display: block; margin-top: 10px; font-weight: bold; }
+  input, select { width: 100%; padding: 8px; margin-top: 5px; }
+  .output { background: #f0f0f0; padding: 10px; margin-top: 10px; border-radius: 5px; }
+  footer { text-align: center; margin-top: 40px; font-size: 12px; color: #666; }
 </style>
 </head>
 <body>
+  <h1>Комбиниран Калкулатор</h1>
 
-<div class="card">
-  <h2>Калкулатор: Надценка / Отстъпка</h2>
-
-  <div class="row">
-    <label>Сума:</label>
-    <input id="amount" type="number" min="0" placeholder="0.00">
+  <div class="tabs">
+    <button id="tab-percent" class="active" onclick="show('percent')">Проценти</button>
+    <button id="tab-vat" onclick="show('vat')">ДДС</button>
+    <button id="tab-currency" onclick="show('currency')">BGN / EUR</button>
   </div>
 
-  <div class="row">
-    <label>% Надценка / Отстъпка:</label>
-    <input id="percent" type="number" value="0" min="-100" max="100">
-  </div>
-
-  <div class="row">
-    <label>Валута:</label>
-    <select id="currency">
-      <option value="BGN">BGN</option>
-      <option value="EUR">EUR</option>
-      <option value="USD">USD</option>
-      <option value="GBP">GBP</option>
+  <div id="percent" class="section active">
+    <label>Сума (надценка/отстъпка):</label>
+    <input type="number" id="percentBase" oninput="calcPercent()"/>
+    <label>Процент:</label>
+    <input type="number" id="percentValue" oninput="calcPercent()"/>
+    <select id="percentType" onchange="calcPercent()">
+      <option value="plus">+ Надценка</option>
+      <option value="minus">– Отстъпка</option>
     </select>
+    <div id="percentOutput" class="output"></div>
   </div>
 
-  <button onclick="calculate()">Изчисли</button>
-
-  <div id="result" class="output"></div>
-  <button id="copyBtn" style="display:none;">Копирай резултата</button>
-
-  <div class="history">
-    <h3>История на изчисленията:</h3>
-    <div id="historyList"></div>
+  <div id="vat" class="section">
+    <label>Сума с ДДС:</label>
+    <input type="number" id="vatGross" oninput="calcVatGross()"/>
+    <div id="vatGrossRes" class="output"></div>
+    <label>Сума без ДДС:</label>
+    <input type="number" id="vatNet" oninput="calcVatNet()"/>
+    <div id="vatNetRes" class="output"></div>
+    <label>Само ДДС:</label>
+    <input type="number" id="vatOnly" oninput="calcVatOnly()"/>
+    <div id="vatOnlyRes" class="output"></div>
   </div>
-</div>
+
+  <div id="currency" class="section">
+    <label>Лева (BGN):</label>
+    <input type="number" id="bgn" oninput="convCur('bgn')"/>
+    <label>Евро (EUR):</label>
+    <input type="number" id="eur" oninput="convCur('eur')"/>
+    <div class="output">Курс: 1 EUR = 1.95583 BGN</div>
+  </div>
+
+  <footer>by Dimitar Kolev</footer>
 
 <script>
-// фиктивни валутни курсове – бихте могли да извличате данни от истински API
-const rates = { BGN:1, EUR:1.96, USD:1.75, GBP:2.20 };
-let history = [];
-
-function calculate() {
-  const amt = parseFloat(document.getElementById('amount').value) || 0;
-  const pct = parseFloat(document.getElementById('percent').value) || 0;
-  const cur = document.getElementById('currency').value;
-  const baseBGN = amt * rates[cur];
-  const finalBGN = baseBGN * (1 + pct/100);
-  const final = finalBGN / rates[cur];
-  const sign = pct >= 0 ? '+' : '';
-  const colorClass = pct >= 0 ? 'success' : 'warning';
-
-  const resultText = `${final.toFixed(2)} ${cur} (${sign}${pct} %)`;
-  const out = document.getElementById('result');
-  out.textContent = resultText;
-  out.className = 'output ' + colorClass;
-
-  document.getElementById('copyBtn').style.display = 'inline-block';
-  document.getElementById('copyBtn').onclick = () => {
-    navigator.clipboard.writeText(resultText);
-    alert('Копирано!');
-  };
-
-  addToHistory(`${amt.toFixed(2)} ${cur} → ${resultText}`);
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
 }
 
-function addToHistory(text) {
-  history.unshift(text);
-  if (history.length > 5) history.pop();
-  renderHistory();
+function calcPercent() {
+  const base = parseFloat(document.getElementById('percentBase').value) || 0;
+  const pct = parseFloat(document.getElementById('percentValue').value) || 0;
+  const type = document.getElementById('percentType').value;
+  const out = document.getElementById('percentOutput');
+  const result = type === 'plus'
+    ? base * (1 + pct / 100)
+    : base * (1 - pct / 100);
+  const diff = Math.abs(result - base);
+  out.innerHTML = `Нова сума: ${result.toFixed(2)} лв<br>Разлика: ${diff.toFixed(2)} лв`;
 }
 
-function renderHistory() {
-  const list = document.getElementById('historyList');
-  list.innerHTML = '';
-  history.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'history-item';
-    div.textContent = item;
-    list.appendChild(div);
-  });
+function calcVatGross() {
+  const v = parseFloat(document.getElementById('vatGross').value) || 0;
+  const net20 = (v / 1.2).toFixed(2), vat20 = (v - net20).toFixed(2);
+  const net9 = (v / 1.09).toFixed(2), vat9 = (v - net9).toFixed(2);
+  document.getElementById('vatGrossRes').innerHTML =
+    `20 %: Нетна = ${net20} лв, ДДС = ${vat20} лв<br>9 %: Нетна = ${net9} лв, ДДС = ${vat9} лв`;
 }
 
-// При смяна на тема браузър – тук CSS автоматично сменя
+function calcVatNet() {
+  const n = parseFloat(document.getElementById('vatNet').value) || 0;
+  const gross20 = (n * 1.2).toFixed(2), vat20 = (n * 0.2).toFixed(2);
+  const gross9 = (n * 1.09).toFixed(2), vat9 = (n * 0.09).toFixed(2);
+  document.getElementById('vatNetRes').innerHTML =
+    `20 %: Общo = ${gross20} лв, ДДС = ${vat20} лв<br>9 %: Общo = ${gross9} лв, ДДС = ${vat9} лв`;
+}
+
+function calcVatOnly() {
+  const d = parseFloat(document.getElementById('vatOnly').value) || 0;
+  const net20 = (d / 0.2).toFixed(2), gross20 = (net20 * 1.2).toFixed(2);
+  const net9 = (d / 0.09).toFixed(2), gross9 = (net9 * 1.09).toFixed(2);
+  document.getElementById('vatOnlyRes').innerHTML =
+    `20 %: Нетна = ${net20} лв, Общо = ${gross20} лв<br>9 %: Нетна = ${net9} лв, Общо = ${gross9} лв`;
+}
+
+function convCur(src) {
+  const rate = 1.95583;
+  const b = document.getElementById('bgn');
+  const e = document.getElementById('eur');
+  const val = parseFloat(src === 'bgn' ? b.value : e.value) || 0;
+  if (src === 'bgn') e.value = (val / rate).toFixed(2);
+  else b.value = (val * rate).toFixed(2);
+}
 </script>
-
 </body>
 </html>
+
 
