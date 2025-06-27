@@ -14,9 +14,12 @@
       max-width: 380px; margin: auto;
     }
     h1 {
-      font-size: 18px;
+      font-size: 20px;
       text-align: center;
       margin-bottom: 1rem;
+      color: #4CAF50;
+      border-bottom: 1px solid #333;
+      padding-bottom: 5px;
     }
     .tabs {
       display: flex;
@@ -48,6 +51,7 @@
       font-weight: bold;
       margin-top: 0.9rem;
       display: block;
+      color: #a4ffb1;
     }
     input, select {
       width: 95%;
@@ -82,7 +86,7 @@
   </style>
 </head>
 <body>
-<h1>Калкулатор</h1>
+<h1>Комбиниран Калкулатор</h1>
 <div class="tabs">
   <button id="tab-percent" class="active" onclick="show('percent')">Проценти</button>
   <button id="tab-vat" onclick="show('vat')">ДДС</button>
@@ -102,13 +106,13 @@
 </div>
 
 <div id="vat" class="section">
-  <label>Сума с ДДС</label>
+  <label>Сума с ДДС (20%)</label>
   <input type="number" id="vatGross" oninput="calcVatGross()"/>
   <div id="vatGrossRes" class="output"></div>
-  <label>Сума без ДДС</label>
+  <label>Сума без ДДС (20%)</label>
   <input type="number" id="vatNet" oninput="calcVatNet()"/>
   <div id="vatNetRes" class="output"></div>
-  <label>Само ДДС</label>
+  <label>Само ДДС (20%)</label>
   <input type="number" id="vatOnly" oninput="calcVatOnly()"/>
   <div id="vatOnlyRes" class="output"></div>
 </div>
@@ -141,24 +145,24 @@ function calcPercent() {
 }
 function calcVatGross() {
   const v = parseFloat(document.getElementById('vatGross').value) || 0;
-  const net20 = (v / 1.2).toFixed(2), vat20 = (v - net20).toFixed(2);
-  const net9 = (v / 1.09).toFixed(2), vat9 = (v - net9).toFixed(2);
+  const net20 = (v / 1.2).toFixed(2);
+  const vat20 = (v - net20).toFixed(2);
   document.getElementById('vatGrossRes').innerHTML =
-    `20%: Нетна = ${net20} лв, ДДС = ${vat20} лв<br>9%: Нетна = ${net9} лв, ДДС = ${vat9} лв`;
+    `Нетна сума: ${net20} лв<br>ДДС (20%): ${vat20} лв`;
 }
 function calcVatNet() {
   const n = parseFloat(document.getElementById('vatNet').value) || 0;
-  const gross20 = (n * 1.2).toFixed(2), vat20 = (n * 0.2).toFixed(2);
-  const gross9 = (n * 1.09).toFixed(2), vat9 = (n * 0.09).toFixed(2);
+  const gross20 = (n * 1.2).toFixed(2);
+  const vat20 = (n * 0.2).toFixed(2);
   document.getElementById('vatNetRes').innerHTML =
-    `20%: Общо = ${gross20} лв, ДДС = ${vat20} лв<br>9%: Общо = ${gross9} лв, ДДС = ${vat9} лв`;
+    `С ДДС: ${gross20} лв<br>ДДС (20%): ${vat20} лв`;
 }
 function calcVatOnly() {
   const d = parseFloat(document.getElementById('vatOnly').value) || 0;
-  const net20 = (d / 0.2).toFixed(2), gross20 = (net20 * 1.2).toFixed(2);
-  const net9 = (d / 0.09).toFixed(2), gross9 = (net9 * 1.09).toFixed(2);
+  const net20 = (d / 0.2).toFixed(2);
+  const gross20 = (net20 * 1.2).toFixed(2);
   document.getElementById('vatOnlyRes').innerHTML =
-    `20%: Нетна = ${net20} лв, Общо = ${gross20} лв<br>9%: Нетна = ${net9} лв, Общо = ${gross9} лв`;
+    `Нетна сума: ${net20} лв<br>Общо с ДДС: ${gross20} лв`;
 }
 function convCur(src) {
   const rate = 1.95583;
