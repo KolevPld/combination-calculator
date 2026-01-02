@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>Калкулатор</title>
-  
+
   <!-- PWA Meta -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#121212">
@@ -160,7 +160,6 @@
   <input type="number" id="eur" oninput="convCur('eur')"/>
   <div class="output">Курс: 1 EUR = 1.95583 BGN</div>
 </div>
-
 <div id="resto" class="section">
   <label>🧾 Цена на продукта</label>
   <input type="number" id="price" placeholder="напр. 10.50">
@@ -200,11 +199,48 @@ function show(id) {
   document.getElementById('tab-' + id).classList.add('active');
 }
 
-function calcPercent() { ... } // (както преди)
-function calcVatGross() { ... }
-function calcVatNet() { ... }
-function calcVatOnly() { ... }
-function convCur(src) { ... }
+function calcPercent() {
+  const base = parseFloat(document.getElementById('percentBase').value) || 0;
+  const pct = parseFloat(document.getElementById('percentValue').value) || 0;
+  const type = document.getElementById('percentType').value;
+  const result = type === 'plus' ? base * (1 + pct / 100) : base * (1 - pct / 100);
+  const diff = Math.abs(result - base);
+  document.getElementById('percentOutput').innerHTML =
+    `Нова сума: ${result.toFixed(2)} лв<br>Разлика: ${diff.toFixed(2)} лв`;
+}
+
+function calcVatGross() {
+  const v = parseFloat(document.getElementById('vatGross').value) || 0;
+  const net20 = (v / 1.2).toFixed(2);
+  const vat20 = (v - net20).toFixed(2);
+  document.getElementById('vatGrossRes').innerHTML =
+    `Нетна сума: ${net20} лв<br>ДДС (20%): ${vat20} лв`;
+}
+
+function calcVatNet() {
+  const n = parseFloat(document.getElementById('vatNet').value) || 0;
+  const gross20 = (n * 1.2).toFixed(2);
+  const vat20 = (n * 0.2).toFixed(2);
+  document.getElementById('vatNetRes').innerHTML =
+    `С ДДС: ${gross20} лв<br>ДДС (20%): ${vat20} лв`;
+}
+
+function calcVatOnly() {
+  const d = parseFloat(document.getElementById('vatOnly').value) || 0;
+  const net20 = (d / 0.2).toFixed(2);
+  const gross20 = (net20 * 1.2).toFixed(2);
+  document.getElementById('vatOnlyRes').innerHTML =
+    `Нетна сума: ${net20} лв<br>Общо с ДДС: ${gross20} лв`;
+}
+
+function convCur(src) {
+  const rate = 1.95583;
+  const b = document.getElementById('bgn');
+  const e = document.getElementById('eur');
+  const val = parseFloat(src === 'bgn' ? b.value : e.value) || 0;
+  if (src === 'bgn') e.value = (val / rate).toFixed(2);
+  else b.value = (val * rate).toFixed(2);
+}
 
 function calculateResto() {
   const price = parseFloat(document.getElementById("price").value);
