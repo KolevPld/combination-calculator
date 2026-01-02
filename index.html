@@ -239,6 +239,37 @@ function convCur(src) {
 
   <p id="resto-result" style="margin-top: 20px; font-weight: bold;"></p>
 </section>
+  function calculateResto() {
+  const price = parseFloat(document.getElementById("price").value);
+  const paid = parseFloat(document.getElementById("paid").value);
+  const priceCurr = document.getElementById("price-currency").value;
+  const paidCurr = document.getElementById("paid-currency").value;
+  const resultCurr = document.getElementById("result-currency").value;
+  const output = document.getElementById("resto-result");
+
+  if (isNaN(price) || isNaN(paid)) {
+    output.textContent = "Моля, въведете валидни стойности.";
+    return;
+  }
+
+  const rate = 1.95583;
+  const toEUR = val => (val / rate);
+  const toBGN = val => (val * rate);
+
+  const priceEUR = priceCurr === "EUR" ? price : toEUR(price);
+  const paidEUR = paidCurr === "EUR" ? paid : toEUR(paid);
+  const restoEUR = paidEUR - priceEUR;
+
+  if (restoEUR < 0) {
+    output.textContent = "Платената сума е недостатъчна.";
+    return;
+  }
+
+  const finalResto = resultCurr === "EUR" ? restoEUR : toBGN(restoEUR);
+  const symbol = resultCurr === "EUR" ? "€" : "лв.";
+
+  output.textContent = `Ресто: ${finalResto.toFixed(2)} ${symbol}`;
+}
 </body>
 </html>
 
