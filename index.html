@@ -205,6 +205,40 @@ function convCur(src) {
   else b.value = (val * rate).toFixed(2);
 }
 </script>
+  <section id="cash-module" style="margin-top: 50px; border-top: 1px solid #ccc; padding-top: 20px;">
+  <h2>Калкулатор за ресто (BGN ⇄ EUR)</h2>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 10px; max-width: 600px;">
+    <div style="flex: 1;">
+      <label>Цена на продукта</label><br>
+      <input type="number" id="price" placeholder="напр. 10.50" style="width: 100%;">
+      <select id="price-currency" style="width: 100%; margin-top: 5px;">
+        <option value="BGN">BGN</option>
+        <option value="EUR">EUR</option>
+      </select>
+    </div>
+
+    <div style="flex: 1;">
+      <label>Платена сума</label><br>
+      <input type="number" id="paid" placeholder="напр. 20.00" style="width: 100%;">
+      <select id="paid-currency" style="width: 100%; margin-top: 5px;">
+        <option value="BGN">BGN</option>
+        <option value="EUR">EUR</option>
+      </select>
+    </div>
+
+    <div style="flex: 1;">
+      <label>Резултат в</label><br>
+      <select id="result-currency" style="width: 100%;">
+        <option value="BGN">BGN</option>
+        <option value="EUR">EUR</option>
+      </select>
+      <button onclick="calculateResto()" style="width: 100%; margin-top: 5px;">Изчисли ресто</button>
+    </div>
+  </div>
+
+  <p id="resto-result" style="margin-top: 20px; font-weight: bold;"></p>
+</section>
 </body>
 </html>
 
