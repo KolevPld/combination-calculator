@@ -116,6 +116,40 @@
       font-size: 11px;
       color: #888;
     }
+    /* 🟩 По‑голям и четим текст за всички резултати */
+.output {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #ffffff !important;
+  background: #1e1e1e !important;
+  border-left: 5px solid #4CAF50 !important;
+}
+
+/* 🟩 Още по‑голям шрифт само за ресто */
+#resto-result {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  text-align: center;
+  padding: 12px 15px !important;
+}
+
+/* 🟩 Подчертаване на текст на резултати в други раздели */
+#percentOutput,
+#vatGrossRes,
+#vatNetRes,
+#vatOnlyRes {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+
+/* 🟩 Малко повече разстояние за мобилни устройства */
+@media (max-width: 480px) {
+  .output {
+    font-size: 17px !important;
+    padding: 12px !important;
+  }
+}
+
   </style>
 </head>
 
