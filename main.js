@@ -59,37 +59,43 @@ function calculateResto() {
   const paidCurr = document.getElementById("paid-currency").value;
   const resultCurr = document.getElementById("result-currency").value;
   const output = document.getElementById("resto-result");
+  const copyBtn = document.getElementById('copy-resto');
 
+  // ❌ Невалидни стойности
   if (isNaN(price) || isNaN(paid)) {
     output.textContent = "Моля, въведете валидни стойности.";
+    copyBtn.style.display = 'none';
     return;
-    document.getElementById('copy-resto').style.display = 'block';
   }
-  
-  function copyResto() {
+
+  const rate = 1.95583;
+  const toEUR = val => val / rate;
+  const toBGN = val => val * rate;
+
+  const priceEUR = priceCurr === "EUR" ? price : toEUR(price);
+  const paidEUR = paidCurr === "EUR" ? paid : toEUR(paid);
+  const restoEUR = paidEUR - priceEUR;
+
+  // ❌ Недостатъчна сума
+  if (restoEUR < 0) {
+    output.textContent = "Платената сума е недостатъчна.";
+    copyBtn.style.display = 'none';
+    return;
+  }
+
+  // ✅ Успешно ресто
+  const finalResto = resultCurr === "EUR" ? restoEUR : toBGN(restoEUR);
+  const symbol = resultCurr === "EUR" ? "€" : "лв.";
+
+  output.textContent = `Ресто: ${finalResto.toFixed(2)} ${symbol}`;
+  copyBtn.style.display = 'block';
+}
+
+function copyResto() {
   const result = document.getElementById('resto-result').textContent;
   navigator.clipboard.writeText(result).then(() => {
     const btn = document.getElementById('copy-resto');
     btn.textContent = "✅ Копирано!";
     setTimeout(() => btn.textContent = "📋 Копирай ресто", 2000);
   });
-}
-
-  const rate = 1.95583;
-  const toEUR = val => (val / rate);
-  const toBGN = val => (val * rate);
-
-  const priceEUR = priceCurr === "EUR" ? price : toEUR(price);
-  const paidEUR = paidCurr === "EUR" ? paid : toEUR(paid);
-  const restoEUR = paidEUR - priceEUR;
-
-  if (restoEUR < 0) {
-    output.textContent = "Платената сума е недостатъчна.";
-    return;
-  }
-
-  const finalResto = resultCurr === "EUR" ? restoEUR : toBGN(restoEUR);
-  const symbol = resultCurr === "EUR" ? "€" : "лв.";
-
-  output.textContent = `Ресто: ${finalResto.toFixed(2)} ${symbol}`;
 }
