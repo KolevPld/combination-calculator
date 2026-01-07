@@ -32,10 +32,21 @@
 <h1>Комбиниран Калкулатор</h1>
 
 <div class="tabs">
-  <button id="tab-percent" class="active" onclick="show('percent')">📈 Проценти</button>
-  <button id="tab-vat" onclick="show('vat')">📊 ДДС</button>
-  <button id="tab-currency" onclick="show('currency')">💱 Валута</button>
-  <button id="tab-resto" onclick="show('resto')">💵 Ресто</button>
+  <button id="tab-percent" class="active" onclick="show('percent')" aria-label="Процентен калкулатор">
+    📈 Проценти
+  </button>
+
+  <button id="tab-vat" onclick="show('vat')" aria-label="Калкулатор за ДДС">
+    📊 ДДС
+  </button>
+
+  <button id="tab-currency" onclick="show('currency')" aria-label="Калкулатор за валута">
+    💱 Валута
+  </button>
+
+  <button id="tab-resto" onclick="show('resto')" aria-label="Калкулатор за ресто">
+    💵 Ресто
+  </button>
 </div>
 
 <div id="percent" class="section active">
