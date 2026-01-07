@@ -102,7 +102,9 @@
     <option value="EUR">EUR</option>
   </select>
 
-  <button onclick="calculateResto()" style="margin-top: 10px;">Изчисли ресто</button>
+  <button onclick="calculateResto()" style="margin-top: 10px;" aria-label="Изчисляване на ресто">
+  Изчисли ресто
+</button>
   <div id="resto-result" class="output"></div>
   <button id="copy-resto" onclick="copyResto()" style="margin-top: 8px; display:none;">📋 Копирай ресто</button>
 </div>
