@@ -63,7 +63,17 @@ function calculateResto() {
   if (isNaN(price) || isNaN(paid)) {
     output.textContent = "Моля, въведете валидни стойности.";
     return;
+    document.getElementById('copy-resto').style.display = 'block';
   }
+  
+  function copyResto() {
+  const result = document.getElementById('resto-result').textContent;
+  navigator.clipboard.writeText(result).then(() => {
+    const btn = document.getElementById('copy-resto');
+    btn.textContent = "✅ Копирано!";
+    setTimeout(() => btn.textContent = "📋 Копирай ресто", 2000);
+  });
+}
 
   const rate = 1.95583;
   const toEUR = val => (val / rate);
