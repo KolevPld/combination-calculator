@@ -14,7 +14,8 @@
   <link rel="apple-touch-icon" href="icon-192.png">
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
+  <link rel="stylesheet" href="style.css">
+  <script defer src="main.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
@@ -22,135 +23,6 @@
         .catch(err => console.error('Service Worker грешка:', err));
     }
   </script>
-
-  <style>
-    :root { color-scheme: dark; }
-    html, body { width: 100%; box-sizing: border-box; }
-    body {
-      background: #121212;
-      color: #ffffff;
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 1rem;
-      max-width: 380px;
-      margin: auto;
-    }
-    h1 {
-      font-size: 22px;
-      text-align: center;
-      margin-bottom: 1rem;
-      color: #4CAF50;
-      border-bottom: 1px solid #333;
-      padding-bottom: 8px;
-      text-shadow: 0 0 5px #4caf50a1;
-    }
-    .tabs {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 1.2rem;
-    }
-    .tabs button {
-      flex: 1;
-      padding: 0.6rem;
-      font-size: 13px;
-      background: linear-gradient(to right, #1e1e1e, #2a2a2a);
-      color: #fff;
-      border: 1px solid #444;
-      border-radius: 10px;
-      transition: 0.3s ease;
-      box-shadow: 0 0 4px #00000055;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .tabs button:hover {
-      background: #333;
-    }
-    .tabs button.active {
-      border-bottom: 3px solid #4CAF50;
-      font-weight: 600;
-    }
-    .section {
-      display: none;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-    .section.active {
-      display: block;
-      opacity: 1;
-    }
-    label {
-      font-size: 13px;
-      font-weight: 600;
-      margin-top: 1rem;
-      display: block;
-      color: #eeeeee;
-    }
-    input, select, button {
-      width: 95%;
-      padding: 8px 12px;
-      margin-top: 6px;
-      font-size: 15px;
-      background: #ffffff;
-      color: #000;
-      border: 1px solid #4CAF50;
-      border-radius: 10px;
-      outline: none;
-      transition: 0.2s;
-      box-shadow: 0 0 4px #4caf5025;
-    }
-    input:focus, select:focus, button:focus {
-      border-color: #66bb6a;
-      box-shadow: 0 0 6px #66bb6a88;
-    }
-    .output {
-      margin-top: 0.9rem;
-      padding: 10px;
-      font-size: 13px;
-      background: #2a2a2a;
-      border-left: 4px solid #4CAF50;
-      border-radius: 8px;
-      box-shadow: 0 0 6px #4caf5040;
-    }
-    footer {
-      text-align: center;
-      margin-top: 2rem;
-      font-size: 11px;
-      color: #888;
-    }
-    /* 🟩 По‑голям и четим текст за всички резултати */
-.output {
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  color: #ffffff !important;
-  background: #1e1e1e !important;
-  border-left: 5px solid #4CAF50 !important;
-}
-
-/* 🟩 Още по‑голям шрифт само за ресто */
-#resto-result {
-  font-size: 18px !important;
-  font-weight: 700 !important;
-  text-align: center;
-  padding: 12px 15px !important;
-}
-
-/* 🟩 Подчертаване на текст на резултати в други раздели */
-#percentOutput,
-#vatGrossRes,
-#vatNetRes,
-#vatOnlyRes {
-  font-size: 15px !important;
-  font-weight: 600 !important;
-}
-
-/* 🟩 Малко повече разстояние за мобилни устройства */
-@media (max-width: 480px) {
-  .output {
-    font-size: 17px !important;
-    padding: 12px !important;
-  }
-}
-
-  </style>
 </head>
 
 <body>
@@ -194,6 +66,7 @@
   <input type="number" id="eur" oninput="convCur('eur')"/>
   <div class="output">Курс: 1 EUR = 1.95583 BGN</div>
 </div>
+
 <div id="resto" class="section">
   <label>🧾 Цена на продукта</label>
   <input type="number" id="price" placeholder="напр. 10.50">
@@ -220,93 +93,5 @@
 </div>
 
 <footer>by Dimitar Kolev</footer>
-
-<script>
-function show(id) {
-  document.querySelectorAll('.section').forEach(s => {
-    s.classList.remove('active');
-    s.style.display = 'none';
-  });
-  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).style.display = 'block';
-  setTimeout(() => document.getElementById(id).classList.add('active'), 20);
-  document.getElementById('tab-' + id).classList.add('active');
-}
-
-function calcPercent() {
-  const base = parseFloat(document.getElementById('percentBase').value) || 0;
-  const pct = parseFloat(document.getElementById('percentValue').value) || 0;
-  const type = document.getElementById('percentType').value;
-  const result = type === 'plus' ? base * (1 + pct / 100) : base * (1 - pct / 100);
-  const diff = Math.abs(result - base);
-  document.getElementById('percentOutput').innerHTML =
-    `Нова сума: ${result.toFixed(2)} лв<br>Разлика: ${diff.toFixed(2)} лв`;
-}
-
-function calcVatGross() {
-  const v = parseFloat(document.getElementById('vatGross').value) || 0;
-  const net20 = (v / 1.2).toFixed(2);
-  const vat20 = (v - net20).toFixed(2);
-  document.getElementById('vatGrossRes').innerHTML =
-    `Нетна сума: ${net20} лв<br>ДДС (20%): ${vat20} лв`;
-}
-
-function calcVatNet() {
-  const n = parseFloat(document.getElementById('vatNet').value) || 0;
-  const gross20 = (n * 1.2).toFixed(2);
-  const vat20 = (n * 0.2).toFixed(2);
-  document.getElementById('vatNetRes').innerHTML =
-    `С ДДС: ${gross20} лв<br>ДДС (20%): ${vat20} лв`;
-}
-
-function calcVatOnly() {
-  const d = parseFloat(document.getElementById('vatOnly').value) || 0;
-  const net20 = (d / 0.2).toFixed(2);
-  const gross20 = (net20 * 1.2).toFixed(2);
-  document.getElementById('vatOnlyRes').innerHTML =
-    `Нетна сума: ${net20} лв<br>Общо с ДДС: ${gross20} лв`;
-}
-
-function convCur(src) {
-  const rate = 1.95583;
-  const b = document.getElementById('bgn');
-  const e = document.getElementById('eur');
-  const val = parseFloat(src === 'bgn' ? b.value : e.value) || 0;
-  if (src === 'bgn') e.value = (val / rate).toFixed(2);
-  else b.value = (val * rate).toFixed(2);
-}
-
-function calculateResto() {
-  const price = parseFloat(document.getElementById("price").value);
-  const paid = parseFloat(document.getElementById("paid").value);
-  const priceCurr = document.getElementById("price-currency").value;
-  const paidCurr = document.getElementById("paid-currency").value;
-  const resultCurr = document.getElementById("result-currency").value;
-  const output = document.getElementById("resto-result");
-
-  if (isNaN(price) || isNaN(paid)) {
-    output.textContent = "Моля, въведете валидни стойности.";
-    return;
-  }
-
-  const rate = 1.95583;
-  const toEUR = val => (val / rate);
-  const toBGN = val => (val * rate);
-
-  const priceEUR = priceCurr === "EUR" ? price : toEUR(price);
-  const paidEUR = paidCurr === "EUR" ? paid : toEUR(paid);
-  const restoEUR = paidEUR - priceEUR;
-
-  if (restoEUR < 0) {
-    output.textContent = "Платената сума е недостатъчна.";
-    return;
-  }
-
-  const finalResto = resultCurr === "EUR" ? restoEUR : toBGN(restoEUR);
-  const symbol = resultCurr === "EUR" ? "€" : "лв.";
-
-  output.textContent = `Ресто: ${finalResto.toFixed(2)} ${symbol}`;
-}
-</script>
 </body>
 </html>
