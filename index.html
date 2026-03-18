@@ -2,114 +2,152 @@
 <html lang="bg">
 <head>
   <meta charset="utf-8"/>
-  <meta name="description" content="Комбиниран калкулатор за проценти, ДДС, валута и ресто – лесен и удобен.">
+  <meta name="description" content="Комбиниран калкулатор за проценти, марж, ДДС, валута и магазин.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>Калкулатор</title>
 
   <!-- PWA Meta -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#121212">
+  <meta name="theme-color" content="#0b0f1e">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="icon" href="icon-192.png" type="image/png">
 
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script defer src="main.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('Service Worker регистриран успешно!'))
-        .catch(err => console.error('Service Worker грешка:', err));
+        .then(() => console.log('SW registered'))
+        .catch(err => console.error('SW error:', err));
     }
   </script>
 </head>
 
 <body>
-<h1>Комбиниран Калкулатор</h1>
+<header>
+  <h1>📊 Калкулатор</h1>
+</header>
 
-<div class="tabs">
-  <button id="tab-percent" class="active" onclick="show('percent')" aria-label="Процентен калкулатор">
-    📈 Проценти
-  </button>
+<nav class="tabs">
+  <button id="tab-percent" class="active" onclick="show('percent')" aria-label="Проценти">📈 Проценти</button>
+  <button id="tab-vat" onclick="show('vat')" aria-label="ДДС">📦 ДДС</button>
+  <button id="tab-currency" onclick="show('currency')" aria-label="Валута">💱 Валута</button>
+  <button id="tab-shop" onclick="show('shop')" aria-label="Магазин">🏪 Магазин</button>
+</nav>
 
-  <button id="tab-vat" onclick="show('vat')" aria-label="Калкулатор за ДДС">
-    📊 ДДС
-  </button>
-
-  <button id="tab-currency" onclick="show('currency')" aria-label="Калкулатор за валута">
-    💱 Валута
-  </button>
-
-  <button id="tab-resto" onclick="show('resto')" aria-label="Калкулатор за ресто">
-    💵 Ресто
-  </button>
-</div>
-
+<!-- ═══ ПРОЦЕНТИ ═══ -->
 <div id="percent" class="section active">
-  <label>💰 Сума (отстъпка/надценка)</label>
-  <input type="number" id="percentBase" oninput="calcPercent()"/>
-  <label>📉 Процент</label>
-  <input type="number" id="percentValue" oninput="calcPercent()"/>
-  <select id="percentType" onchange="calcPercent()">
-    <option value="plus">+ Надценка</option>
-    <option value="minus">– Отстъпка</option>
-  </select>
-  <div id="percentOutput" class="output"></div>
+
+  <div class="card">
+    <h3>💰 Надценка / Отстъпка</h3>
+    <label>Базова сума</label>
+    <input type="number" id="percentBase" placeholder="0.00" oninput="calcPercent()"/>
+    <label>Процент</label>
+    <input type="number" id="percentValue" placeholder="0" oninput="calcPercent()"/>
+    <select id="percentType" onchange="calcPercent()">
+      <option value="plus">+ Надценка</option>
+      <option value="minus">– Отстъпка</option>
+    </select>
+    <div id="percentOutput" class="output"></div>
+  </div>
+
+  <div class="card">
+    <h3>📐 Марж калкулатор</h3>
+    <p class="card-hint">Покупна цена + желан марж % → продажна цена</p>
+    <label>Покупна цена (лв)</label>
+    <input type="number" id="marginCost" placeholder="0.00" oninput="calcMargin()"/>
+    <label>Желан марж %</label>
+    <input type="number" id="marginPct" placeholder="напр. 30" oninput="calcMargin()"/>
+    <div id="marginOutput" class="output"></div>
+  </div>
+
 </div>
 
+<!-- ═══ ДДС ═══ -->
 <div id="vat" class="section">
-  <label>💸 Сума с ДДС (20%)</label>
-  <input type="number" id="vatGross" oninput="calcVatGross()"/>
-  <div id="vatGrossRes" class="output"></div>
-  <label>🏷️ Сума без ДДС (20%)</label>
-  <input type="number" id="vatNet" oninput="calcVatNet()"/>
-  <div id="vatNetRes" class="output"></div>
-  <label>📦 Само ДДС (20%)</label>
-  <input type="number" id="vatOnly" oninput="calcVatOnly()"/>
-  <div id="vatOnlyRes" class="output"></div>
+
+  <div class="card">
+    <h3>🧾 Изчисли ДДС (20%)</h3>
+    <label>Цена с ДДС</label>
+    <input type="number" id="vatGross" placeholder="0.00" oninput="calcVatGross()"/>
+    <div id="vatGrossRes" class="output"></div>
+    <label>Цена без ДДС</label>
+    <input type="number" id="vatNet" placeholder="0.00" oninput="calcVatNet()"/>
+    <div id="vatNetRes" class="output"></div>
+    <label>Само ДДС сума</label>
+    <input type="number" id="vatOnly" placeholder="0.00" oninput="calcVatOnly()"/>
+    <div id="vatOnlyRes" class="output"></div>
+  </div>
+
+  <div class="card">
+    <h3>📦 Пакетно изчисление</h3>
+    <div class="batch-mode-row">
+      <span>Цените са:</span>
+      <select id="batchMode" onchange="calcVatBatch()">
+        <option value="gross">С ДДС</option>
+        <option value="net">Без ДДС</option>
+      </select>
+    </div>
+    <div id="vatBatchItems">
+      <div class="batch-row">
+        <input type="text" placeholder="Артикул" class="batch-name">
+        <input type="number" placeholder="Цена" class="batch-price" oninput="calcVatBatch()">
+      </div>
+      <div class="batch-row">
+        <input type="text" placeholder="Артикул" class="batch-name">
+        <input type="number" placeholder="Цена" class="batch-price" oninput="calcVatBatch()">
+      </div>
+      <div class="batch-row">
+        <input type="text" placeholder="Артикул" class="batch-name">
+        <input type="number" placeholder="Цена" class="batch-price" oninput="calcVatBatch()">
+      </div>
+    </div>
+    <button class="btn-secondary" onclick="addBatchRow()">+ Добави артикул</button>
+    <div id="vatBatchResult" class="output"></div>
+  </div>
+
 </div>
 
+<!-- ═══ ВАЛУТА ═══ -->
 <div id="currency" class="section">
-  <label>🇧🇬 Лева (BGN)</label>
-  <input type="number" id="bgn" oninput="convCur('bgn')"/>
-  <label>🇪🇺 Евро (EUR)</label>
-  <input type="number" id="eur" oninput="convCur('eur')"/>
-  <div class="output">Курс: 1 EUR = 1.95583 BGN</div>
+  <div class="card">
+    <div class="rate-header">
+      <h3>💱 Конвертор</h3>
+      <span id="rateStatus" class="rate-badge">⏳ Зарежда...</span>
+    </div>
+    <div id="rateDisplay" class="rate-info"></div>
+
+    <label>🇧🇬 Лева (BGN)</label>
+    <input type="number" id="bgn" placeholder="0.00" oninput="convCur('bgn')"/>
+    <label>🇪🇺 Евро (EUR)</label>
+    <input type="number" id="eur" placeholder="0.00" oninput="convCur('eur')"/>
+    <label>🇺🇸 Долар (USD)</label>
+    <input type="number" id="usd" placeholder="0.00" oninput="convCur('usd')"/>
+
+    <button class="btn-secondary" onclick="fetchRates(true)" style="margin-top:12px">🔄 Обнови курса</button>
+  </div>
 </div>
 
-<div id="resto" class="section">
-  <label>🧾 Цена на продукта</label>
-  <input type="number" id="price" placeholder="напр. 10.50">
-  <select id="price-currency">
-    <option value="BGN">BGN</option>
-    <option value="EUR">EUR</option>
-  </select>
-
-  <label>💵 Платена сума</label>
-  <input type="number" id="paid" placeholder="напр. 20.00">
-  <select id="paid-currency">
-    <option value="BGN">BGN</option>
-    <option value="EUR">EUR</option>
-  </select>
-
-  <label>🔁 Покажи ресто в</label>
-  <select id="result-currency">
-    <option value="BGN">BGN</option>
-    <option value="EUR">EUR</option>
-  </select>
-
-  <button onclick="calculateResto()" style="margin-top: 10px;" aria-label="Изчисляване на ресто">
-  Изчисли ресто
-</button>
-  <div id="resto-result" class="output"></div>
-  <button id="copy-resto" onclick="copyResto()" style="margin-top: 8px; display:none;"
-        aria-label="Копирай рестото в клипборда">
-  📋 Копирай ресто
-</button>
+<!-- ═══ МАГАЗИН ═══ -->
+<div id="shop" class="section">
+  <div class="card">
+    <h3>🏪 Надценка по категория</h3>
+    <label>Категория</label>
+    <select id="shopCategory" onchange="updateShopMarkup()">
+      <option value="alcohol">🍷 Алкохол</option>
+      <option value="cigarettes">🚬 Цигари</option>
+      <option value="sweets">🍰 Сладки изделия</option>
+    </select>
+    <label>Надценка %</label>
+    <input type="number" id="shopMarkup" value="25" oninput="calcShop()"/>
+    <label>Покупна цена без ДДС (лв)</label>
+    <input type="number" id="shopCost" placeholder="0.00" oninput="calcShop()"/>
+    <div id="shopOutput" class="output"></div>
+  </div>
 </div>
 
 <footer>by Dimitar Kolev</footer>

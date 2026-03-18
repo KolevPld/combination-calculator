@@ -1,3 +1,12 @@
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function row(label, value, highlight) {
+  return `<div class="res-row">
+    <span class="res-label">${label}</span>
+    <span class="res-value${highlight ? ' highlight' : ''}">${value}</span>
+  </div>`;
+}
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
 function show(id) {
   document.querySelectorAll('.section').forEach(s => {
     s.classList.remove('active');
@@ -9,93 +18,167 @@ function show(id) {
   document.getElementById('tab-' + id).classList.add('active');
 }
 
+// ── Проценти: Надценка / Отстъпка ────────────────────────────────────────────
 function calcPercent() {
   const base = parseFloat(document.getElementById('percentBase').value) || 0;
-  const pct = parseFloat(document.getElementById('percentValue').value) || 0;
+  const pct  = parseFloat(document.getElementById('percentValue').value) || 0;
   const type = document.getElementById('percentType').value;
+  if (!base && !pct) { document.getElementById('percentOutput').innerHTML = ''; return; }
   const result = type === 'plus' ? base * (1 + pct / 100) : base * (1 - pct / 100);
-  const diff = Math.abs(result - base);
+  const diff   = Math.abs(result - base);
   document.getElementById('percentOutput').innerHTML =
-    `Нова сума: ${result.toFixed(2)} лв<br>Разлика: ${diff.toFixed(2)} лв`;
+    row('Нова сума', `${result.toFixed(2)} лв`, true) +
+    row('Разлика',  `${diff.toFixed(2)} лв`);
 }
 
+// ── Проценти: Марж калкулатор ─────────────────────────────────────────────────
+function calcMargin() {
+  const cost   = parseFloat(document.getElementById('marginCost').value) || 0;
+  const margin = parseFloat(document.getElementById('marginPct').value)  || 0;
+  const out    = document.getElementById('marginOutput');
+  if (!cost || !margin) { out.innerHTML = ''; return; }
+  if (margin >= 100) {
+    out.innerHTML = '<div class="warn">⚠️ Маржът не може да е 100% или повече</div>';
+    return;
+  }
+  const sell   = cost / (1 - margin / 100);
+  const profit = sell - cost;
+  const markup = (profit / cost * 100);
+  out.innerHTML =
+    row('Продажна цена', `${sell.toFixed(2)} лв`, true) +
+    row('Печалба',       `${profit.toFixed(2)} лв`) +
+    row('Надценка',      `${markup.toFixed(1)}%`);
+}
+
+// ── ДДС ───────────────────────────────────────────────────────────────────────
 function calcVatGross() {
-  const v = parseFloat(document.getElementById('vatGross').value) || 0;
-  const net20 = (v / 1.2).toFixed(2);
-  const vat20 = (v - net20).toFixed(2);
+  const v   = parseFloat(document.getElementById('vatGross').value) || 0;
+  const net = (v / 1.2).toFixed(2);
+  const vat = (v - net).toFixed(2);
   document.getElementById('vatGrossRes').innerHTML =
-    `Нетна сума: ${net20} лв<br>ДДС (20%): ${vat20} лв`;
+    row('Нетна сума', `${net} лв`) +
+    row('ДДС 20%',    `${vat} лв`, true);
 }
 
 function calcVatNet() {
-  const n = parseFloat(document.getElementById('vatNet').value) || 0;
-  const gross20 = (n * 1.2).toFixed(2);
-  const vat20 = (n * 0.2).toFixed(2);
+  const n     = parseFloat(document.getElementById('vatNet').value) || 0;
+  const gross = (n * 1.2).toFixed(2);
+  const vat   = (n * 0.2).toFixed(2);
   document.getElementById('vatNetRes').innerHTML =
-    `С ДДС: ${gross20} лв<br>ДДС (20%): ${vat20} лв`;
+    row('С ДДС',   `${gross} лв`, true) +
+    row('ДДС 20%', `${vat} лв`);
 }
 
 function calcVatOnly() {
-  const d = parseFloat(document.getElementById('vatOnly').value) || 0;
-  const net20 = (d / 0.2).toFixed(2);
-  const gross20 = (net20 * 1.2).toFixed(2);
+  const d     = parseFloat(document.getElementById('vatOnly').value) || 0;
+  const net   = (d / 0.2).toFixed(2);
+  const gross = (net * 1.2).toFixed(2);
   document.getElementById('vatOnlyRes').innerHTML =
-    `Нетна сума: ${net20} лв<br>Общо с ДДС: ${gross20} лв`;
+    row('Нетна сума',   `${net} лв`) +
+    row('Общо с ДДС',   `${gross} лв`, true);
+}
+
+// ── ДДС: Пакетно изчисление ───────────────────────────────────────────────────
+function calcVatBatch() {
+  const rows    = document.querySelectorAll('.batch-row');
+  const isGross = document.getElementById('batchMode').value === 'gross';
+  let totalNet = 0, totalVat = 0, totalGross = 0, count = 0;
+
+  rows.forEach(r => {
+    const price = parseFloat(r.querySelector('.batch-price').value) || 0;
+    if (!price) return;
+    const net = isGross ? price / 1.2 : price;
+    totalNet   += net;
+    totalVat   += net * 0.2;
+    totalGross += net * 1.2;
+    count++;
+  });
+
+  const out = document.getElementById('vatBatchResult');
+  if (!count) { out.innerHTML = ''; return; }
+  out.innerHTML =
+    row('Артикули',    `${count}`) +
+    row('Общо без ДДС', `${totalNet.toFixed(2)} лв`) +
+    row('Общо ДДС',    `${totalVat.toFixed(2)} лв`) +
+    row('Общо с ДДС',  `${totalGross.toFixed(2)} лв`, true);
+}
+
+function addBatchRow() {
+  const container = document.getElementById('vatBatchItems');
+  const r = document.createElement('div');
+  r.className = 'batch-row';
+  r.innerHTML =
+    `<input type="text" placeholder="Артикул" class="batch-name">` +
+    `<input type="number" placeholder="Цена" class="batch-price" oninput="calcVatBatch()">` +
+    `<button class="btn-remove" onclick="this.parentElement.remove();calcVatBatch();" aria-label="Премахни">✕</button>`;
+  container.appendChild(r);
+}
+
+// ── Валута (live rates) ───────────────────────────────────────────────────────
+let eurToBgn = 1.95583;
+let eurToUsd = 1.08;
+
+async function fetchRates(manual = false) {
+  const statusEl  = document.getElementById('rateStatus');
+  const displayEl = document.getElementById('rateDisplay');
+  if (manual) { statusEl.textContent = '⏳ Зарежда...'; statusEl.className = 'rate-badge'; }
+  try {
+    const res  = await fetch('https://api.frankfurter.app/latest?from=EUR&to=BGN,USD');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    eurToBgn = data.rates.BGN;
+    eurToUsd = data.rates.USD;
+    const now = new Date().toLocaleTimeString('bg-BG', { hour: '2-digit', minute: '2-digit' });
+    statusEl.textContent  = '🟢 Актуален';
+    statusEl.className    = 'rate-badge live';
+    displayEl.innerHTML   =
+      `1 EUR = <b>${eurToBgn.toFixed(5)} BGN</b> &nbsp;|&nbsp; 1 EUR = <b>${eurToUsd.toFixed(4)} USD</b>` +
+      `<small>Обновено: ${now}</small>`;
+  } catch {
+    statusEl.textContent  = '🔴 Фиксиран';
+    statusEl.className    = 'rate-badge fixed';
+    displayEl.innerHTML   = `1 EUR = <b>${eurToBgn.toFixed(5)} BGN</b> (фиксиран курс)`;
+  }
 }
 
 function convCur(src) {
-  const rate = 1.95583;
-  const b = document.getElementById('bgn');
-  const e = document.getElementById('eur');
-  const val = parseFloat(src === 'bgn' ? b.value : e.value) || 0;
-  if (src === 'bgn') e.value = (val / rate).toFixed(2);
-  else b.value = (val * rate).toFixed(2);
+  const val = parseFloat(document.getElementById(src).value) || 0;
+  let eurVal;
+  if      (src === 'eur') eurVal = val;
+  else if (src === 'bgn') eurVal = val / eurToBgn;
+  else                    eurVal = val / eurToUsd;
+
+  if (src !== 'bgn') document.getElementById('bgn').value = (eurVal * eurToBgn).toFixed(2);
+  if (src !== 'eur') document.getElementById('eur').value = eurVal.toFixed(4);
+  if (src !== 'usd') document.getElementById('usd').value = (eurVal * eurToUsd).toFixed(2);
 }
 
-function calculateResto() {
-  const price = parseFloat(document.getElementById("price").value);
-  const paid = parseFloat(document.getElementById("paid").value);
-  const priceCurr = document.getElementById("price-currency").value;
-  const paidCurr = document.getElementById("paid-currency").value;
-  const resultCurr = document.getElementById("result-currency").value;
-  const output = document.getElementById("resto-result");
-  const copyBtn = document.getElementById('copy-resto');
+// ── Магазин ───────────────────────────────────────────────────────────────────
+const shopDefaults = { alcohol: 25, cigarettes: 8, sweets: 35 };
 
-  // ❌ Невалидни стойности
-  if (isNaN(price) || isNaN(paid)) {
-    output.textContent = "Моля, въведете валидни стойности.";
-    copyBtn.style.display = 'none';
-    return;
-  }
-
-  const rate = 1.95583;
-  const toEUR = val => val / rate;
-  const toBGN = val => val * rate;
-
-  const priceEUR = priceCurr === "EUR" ? price : toEUR(price);
-  const paidEUR = paidCurr === "EUR" ? paid : toEUR(paid);
-  const restoEUR = paidEUR - priceEUR;
-
-  // ❌ Недостатъчна сума
-  if (restoEUR < 0) {
-    output.textContent = "Платената сума е недостатъчна.";
-    copyBtn.style.display = 'none';
-    return;
-  }
-
-  // ✅ Успешно ресто
-  const finalResto = resultCurr === "EUR" ? restoEUR : toBGN(restoEUR);
-  const symbol = resultCurr === "EUR" ? "€" : "лв.";
-
-  output.textContent = `Ресто: ${finalResto.toFixed(2)} ${symbol}`;
-  copyBtn.style.display = 'block';
+function updateShopMarkup() {
+  const cat = document.getElementById('shopCategory').value;
+  document.getElementById('shopMarkup').value = shopDefaults[cat];
+  calcShop();
 }
 
-function copyResto() {
-  const result = document.getElementById('resto-result').textContent;
-  navigator.clipboard.writeText(result).then(() => {
-    const btn = document.getElementById('copy-resto');
-    btn.textContent = "✅ Копирано!";
-    setTimeout(() => btn.textContent = "📋 Копирай ресто", 2000);
-  });
+function calcShop() {
+  const cost   = parseFloat(document.getElementById('shopCost').value)   || 0;
+  const markup = parseFloat(document.getElementById('shopMarkup').value) || 0;
+  const out    = document.getElementById('shopOutput');
+  if (!cost) { out.innerHTML = ''; return; }
+  const sellNet   = cost * (1 + markup / 100);
+  const sellGross = sellNet * 1.2;
+  const profit    = sellNet - cost;
+  const margin    = (profit / sellNet * 100);
+  out.innerHTML =
+    row('Продажна без ДДС', `${sellNet.toFixed(2)} лв`) +
+    row('Продажна с ДДС',   `${sellGross.toFixed(2)} лв`, true) +
+    row('Печалба',          `${profit.toFixed(2)} лв`) +
+    row('Марж',             `${margin.toFixed(1)}%`);
 }
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  fetchRates();
+});
