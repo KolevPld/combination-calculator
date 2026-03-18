@@ -114,31 +114,15 @@ function addBatchRow() {
   container.appendChild(r);
 }
 
-// ── Валута (live rates) ───────────────────────────────────────────────────────
-let eurToBgn = 1.95583;
-let eurToUsd = 1.08;
+// ── Валута (фиксиран курс) ────────────────────────────────────────────────────
+const eurToBgn = 1.95583;
+const eurToUsd = 1.08;
 
-async function fetchRates(manual = false) {
-  const statusEl  = document.getElementById('rateStatus');
-  const displayEl = document.getElementById('rateDisplay');
-  if (manual) { statusEl.textContent = '⏳ Зарежда...'; statusEl.className = 'rate-badge'; }
-  try {
-    const res  = await fetch('https://api.frankfurter.app/latest?from=EUR&to=BGN,USD');
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    eurToBgn = data.rates.BGN;
-    eurToUsd = data.rates.USD;
-    const now = new Date().toLocaleTimeString('bg-BG', { hour: '2-digit', minute: '2-digit' });
-    statusEl.textContent  = '🟢 Актуален';
-    statusEl.className    = 'rate-badge live';
-    displayEl.innerHTML   =
-      `1 EUR = <b>${eurToBgn.toFixed(5)} BGN</b> &nbsp;|&nbsp; 1 EUR = <b>${eurToUsd.toFixed(4)} USD</b>` +
-      `<small>Обновено: ${now}</small>`;
-  } catch {
-    statusEl.textContent  = '🔴 Фиксиран';
-    statusEl.className    = 'rate-badge fixed';
-    displayEl.innerHTML   = `1 EUR = <b>${eurToBgn.toFixed(5)} BGN</b> (фиксиран курс)`;
-  }
+function fetchRates() {
+  document.getElementById('rateStatus').textContent  = '🔒 Фиксиран';
+  document.getElementById('rateStatus').className    = 'rate-badge fixed';
+  document.getElementById('rateDisplay').innerHTML   =
+    `1 EUR = <b>${eurToBgn.toFixed(5)} BGN</b> &nbsp;|&nbsp; 1 EUR = <b>${eurToUsd.toFixed(4)} USD</b>`;
 }
 
 function convCur(src) {
@@ -154,7 +138,7 @@ function convCur(src) {
 }
 
 // ── Магазин ───────────────────────────────────────────────────────────────────
-const shopDefaults = { alcohol: 25, cigarettes: 8, sweets: 35 };
+const shopDefaults = { alcohol: 50, cigarettes: 7, sweets: 60 };
 
 function updateShopMarkup() {
   const cat = document.getElementById('shopCategory').value;
