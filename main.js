@@ -125,6 +125,10 @@ function fetchRates() {
     `1 EUR = <b>${eurToBgn.toFixed(5)} BGN</b> &nbsp;|&nbsp; 1 EUR = <b>${eurToUsd.toFixed(4)} USD</b>`;
 }
 
+function clearCurrency() {
+  ['bgn', 'eur', 'usd'].forEach(id => document.getElementById(id).value = '');
+}
+
 function convCur(src) {
   const val = parseFloat(document.getElementById(src).value) || 0;
   let eurVal;
