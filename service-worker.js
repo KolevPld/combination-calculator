@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calculator-cache-v6';
+const CACHE_NAME = 'calculator-cache-v7';
 const FILES_TO_CACHE = [
   './',
   './index.html',

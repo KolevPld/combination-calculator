@@ -114,15 +114,31 @@ function addBatchRow() {
   container.appendChild(r);
 }
 
-// ── Валута (фиксиран курс) ────────────────────────────────────────────────────
-const eurToBgn = 1.95583;
-const eurToUsd = 1.08;
+// ── Валута ────────────────────────────────────────────────────────────────────
+const eurToBgn = 1.95583; // фиксиран курс (currency board)
+let eurToUsd = 1.08;      // ще се обнови от API
 
-function fetchRates() {
-  document.getElementById('rateStatus').textContent  = '🔒 Фиксиран';
-  document.getElementById('rateStatus').className    = 'rate-badge fixed';
-  document.getElementById('rateDisplay').innerHTML   =
-    `1 EUR = <b>${eurToBgn.toFixed(5)} BGN</b> &nbsp;|&nbsp; 1 EUR = <b>${eurToUsd.toFixed(4)} USD</b>`;
+async function fetchRates() {
+  const statusEl  = document.getElementById('rateStatus');
+  const displayEl = document.getElementById('rateDisplay');
+  try {
+    const res  = await fetch('https://api.frankfurter.app/latest?from=EUR&to=USD');
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    eurToUsd = data.rates.USD;
+    const now = new Date().toLocaleTimeString('bg-BG', { hour: '2-digit', minute: '2-digit' });
+    statusEl.textContent = '🟢 Актуален';
+    statusEl.className   = 'rate-badge live';
+    displayEl.innerHTML  =
+      `1 EUR = <b>${eurToBgn.toFixed(5)} BGN</b> &nbsp;|&nbsp; 1 EUR = <b>${eurToUsd.toFixed(4)} USD</b>` +
+      `<small>USD обновен: ${now}</small>`;
+  } catch {
+    statusEl.textContent = '🔴 USD не е актуален';
+    statusEl.className   = 'rate-badge fixed';
+    displayEl.innerHTML  =
+      `1 EUR = <b>${eurToBgn.toFixed(5)} BGN</b> &nbsp;|&nbsp; 1 EUR = <b>${eurToUsd.toFixed(4)} USD</b>` +
+      `<small>Няма връзка — използва се последен известен курс</small>`;
+  }
 }
 
 function clearCurrency() {

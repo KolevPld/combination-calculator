@@ -140,7 +140,10 @@
     <label>🇺🇸 Долар (USD)</label>
     <input type="number" id="usd" placeholder="0.00" oninput="convCur('usd')"/>
 
-    <button class="btn-secondary" onclick="clearCurrency()" style="margin-top:12px">🗑️ Изчисти</button>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn-secondary" onclick="fetchRates()" style="flex:1">🔄 Обнови USD</button>
+      <button class="btn-secondary" onclick="clearCurrency()" style="flex:1">🗑️ Изчисти</button>
+    </div>
   </div>
 </div>
 
