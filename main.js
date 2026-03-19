@@ -133,7 +133,7 @@ function convCur(src) {
   else                    eurVal = val / eurToUsd;
 
   if (src !== 'bgn') document.getElementById('bgn').value = (eurVal * eurToBgn).toFixed(2);
-  if (src !== 'eur') document.getElementById('eur').value = eurVal.toFixed(4);
+  if (src !== 'eur') document.getElementById('eur').value = eurVal.toFixed(2);
   if (src !== 'usd') document.getElementById('usd').value = (eurVal * eurToUsd).toFixed(2);
 }
 
@@ -162,7 +162,23 @@ function calcShop() {
     row('Марж',             `${margin.toFixed(1)}%`);
 }
 
+// ── Парола ────────────────────────────────────────────────────────────────────
+function checkPin() {
+  const input = document.getElementById('pin-input').value;
+  if (input === '5999') {
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  } else {
+    const err = document.getElementById('pin-error');
+    err.textContent = 'Грешна парола';
+    document.getElementById('pin-input').value = '';
+    document.getElementById('pin-input').focus();
+    setTimeout(() => { err.textContent = ''; }, 2000);
+  }
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   fetchRates();
+  document.getElementById('pin-input').focus();
 });

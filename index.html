@@ -28,6 +28,18 @@
 </head>
 
 <body>
+
+<div id="lock-screen">
+  <div id="lock-card">
+    <h2>🔐 Калкулатор</h2>
+    <input type="password" id="pin-input" placeholder="Парола" maxlength="20"
+           onkeydown="if(event.key==='Enter') checkPin()"/>
+    <div id="pin-error"></div>
+    <button onclick="checkPin()">Вход</button>
+  </div>
+</div>
+
+<div id="app" style="display:none">
 <header>
   <h1>📊 Калкулатор</h1>
 </header>
@@ -150,5 +162,6 @@
 </div>
 
 <footer>by Dimitar Kolev</footer>
+</div><!-- /#app -->
 </body>
 </html>
