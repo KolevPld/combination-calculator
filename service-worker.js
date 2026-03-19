@@ -1,7 +1,5 @@
-const CACHE_NAME = 'calculator-cache-v7';
+const CACHE_NAME = 'calculator-cache-v8';
 const FILES_TO_CACHE = [
-  './',
-  './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
@@ -25,10 +23,16 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Network-first за HTML и JS — винаги опитва мрежата първо
-  if (event.request.destination === 'document' ||
-      event.request.url.endsWith('.js') ||
-      event.request.url.endsWith('.css')) {
+  const url = event.request.url;
+
+  // index.html — винаги от мрежата, без кеш
+  if (event.request.destination === 'document') {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // JS и CSS — network-first, обновява кеша
+  if (url.includes('.js') || url.includes('.css')) {
     event.respondWith(
       fetch(event.request)
         .then(resp => {
@@ -38,10 +42,11 @@ self.addEventListener('fetch', event => {
         })
         .catch(() => caches.match(event.request))
     );
-  } else {
-    // Cache-first за икони и статични ресурси
-    event.respondWith(
-      caches.match(event.request).then(resp => resp || fetch(event.request))
-    );
+    return;
   }
+
+  // Всичко друго — cache-first
+  event.respondWith(
+    caches.match(event.request).then(resp => resp || fetch(event.request))
+  );
 });
