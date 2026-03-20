@@ -39,31 +39,20 @@ body {
 
 /* ── Header ── */
 header {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 0 0.25rem;
+  text-align: center;
+  padding-top: max(16px, env(safe-area-inset-top, 16px));
+  padding-bottom: 0.25rem;
   width: 100%;
   box-sizing: border-box;
 }
 
-.header-icon {
-  position: absolute;
-  left: 0;
-  font-size: 20px;
-  line-height: 1;
-}
-
 h1 {
+  display: inline-block;
   font-size: 18px;
   font-weight: 700;
   color: var(--accent);
   letter-spacing: -0.3px;
   white-space: nowrap;
-  text-align: center;
-  padding: 0 60px;
-  width: 100%;
 }
 
 /* ── Tabs ── */
