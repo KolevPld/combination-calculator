@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calculator-cache-v13';
+const CACHE_NAME = 'calculator-cache-v14';
 const FILES_TO_CACHE = [
   './manifest.json',
   './icon-192.png',
