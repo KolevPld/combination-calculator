@@ -173,23 +173,7 @@ function clearVat() {
   document.querySelectorAll('.batch-price, .batch-name').forEach(el => el.value = '');
 }
 
-// ── Парола ────────────────────────────────────────────────────────────────────
-function checkPin() {
-  const input = document.getElementById('pin-input').value;
-  if (input === '5999') {
-    document.getElementById('lock-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-  } else {
-    const err = document.getElementById('pin-error');
-    err.textContent = 'Грешна парола';
-    document.getElementById('pin-input').value = '';
-    document.getElementById('pin-input').focus();
-    setTimeout(() => { err.textContent = ''; }, 2000);
-  }
-}
-
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   fetchRates();
-  document.getElementById('pin-input').focus();
 });
