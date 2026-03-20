@@ -1,49 +1,12 @@
-const CACHE_NAME = 'calculator-cache-v15';
-const FILES_TO_CACHE = [
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
-];
-
-self.addEventListener('install', event => {
-  self.skipWaiting();
-  event.waitUntil(
-    // Изтрий ВСИЧКИ стари кешове първо, после кеширай само иконите
-    caches.keys()
-      .then(keys => Promise.all(keys.map(key => caches.delete(key))))
-      .then(() => caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE)))
-  );
-});
+// Self-destruct: изтрива всички кешове, дерегистрира SW, презарежда страницата
+self.addEventListener('install', () => self.skipWaiting());
 
 self.addEventListener('activate', event => {
-  event.waitUntil(self.clients.claim());
-});
-
-self.addEventListener('fetch', event => {
-  const url = event.request.url;
-
-  // index.html — винаги от мрежата, без кеш
-  if (event.request.destination === 'document') {
-    event.respondWith(fetch(event.request));
-    return;
-  }
-
-  // JS и CSS — network-first, обновява кеша
-  if (url.includes('.js') || url.includes('.css')) {
-    event.respondWith(
-      fetch(event.request)
-        .then(resp => {
-          const clone = resp.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          return resp;
-        })
-        .catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
-  // Всичко друго — cache-first
-  event.respondWith(
-    caches.match(event.request).then(resp => resp || fetch(event.request))
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.map(key => caches.delete(key))))
+      .then(() => self.registration.unregister())
+      .then(() => self.clients.matchAll({ type: 'window' }))
+      .then(clients => clients.forEach(client => client.navigate(client.url)))
   );
 });

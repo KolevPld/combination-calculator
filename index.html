@@ -16,21 +16,14 @@
   <link rel="icon" href="icon-192.png" type="image/png">
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=15">
-  <script defer src="main.js?v=15"></script>
+  <link rel="stylesheet" href="style.css?v=16">
+  <script defer src="main.js?v=16"></script>
   <script>
+    // Дерегистрирай всички стари Service Workers
     if ('serviceWorker' in navigator) {
-      // Когато нов SW поеме контрол — презареди страницата
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        window.location.reload();
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(reg => reg.unregister());
       });
-
-      navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' })
-        .then(reg => {
-          // Форсирай проверка за нова версия веднага
-          reg.update();
-        })
-        .catch(err => console.error('SW error:', err));
     }
   </script>
 </head>
