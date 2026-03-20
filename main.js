@@ -157,29 +157,20 @@ function convCur(src) {
   if (src !== 'usd') document.getElementById('usd').value = (eurVal * eurToUsd).toFixed(2);
 }
 
-// ── Магазин ───────────────────────────────────────────────────────────────────
-const shopDefaults = { alcohol: 50, cigarettes: 7, sweets: 60 };
-
-function updateShopMarkup() {
-  const cat = document.getElementById('shopCategory').value;
-  document.getElementById('shopMarkup').value = shopDefaults[cat];
-  calcShop();
+// ── Изчисти ───────────────────────────────────────────────────────────────────
+function clearPercent() {
+  ['percentBase', 'percentValue', 'marginCost', 'marginPct'].forEach(id =>
+    document.getElementById(id).value = '');
+  ['percentOutput', 'marginOutput'].forEach(id =>
+    document.getElementById(id).innerHTML = '');
 }
 
-function calcShop() {
-  const cost   = parseFloat(document.getElementById('shopCost').value)   || 0;
-  const markup = parseFloat(document.getElementById('shopMarkup').value) || 0;
-  const out    = document.getElementById('shopOutput');
-  if (!cost) { out.innerHTML = ''; return; }
-  const sellNet   = cost * (1 + markup / 100);
-  const sellGross = sellNet * 1.2;
-  const profit    = sellNet - cost;
-  const margin    = (profit / sellNet * 100);
-  out.innerHTML =
-    row('Продажна без ДДС', `${sellNet.toFixed(2)} лв`) +
-    row('Продажна с ДДС',   `${sellGross.toFixed(2)} лв`, true) +
-    row('Печалба',          `${profit.toFixed(2)} лв`) +
-    row('Марж',             `${margin.toFixed(1)}%`);
+function clearVat() {
+  ['vatGross', 'vatNet', 'vatOnly'].forEach(id =>
+    document.getElementById(id).value = '');
+  ['vatGrossRes', 'vatNetRes', 'vatOnlyRes', 'vatBatchResult'].forEach(id =>
+    document.getElementById(id).innerHTML = '');
+  document.querySelectorAll('.batch-price, .batch-name').forEach(el => el.value = '');
 }
 
 // ── Парола ────────────────────────────────────────────────────────────────────
