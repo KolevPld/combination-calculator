@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calculator-cache-v11';
+const CACHE_NAME = 'calculator-cache-v12';
 const FILES_TO_CACHE = [
   './manifest.json',
   './icon-192.png',
@@ -8,18 +8,15 @@ const FILES_TO_CACHE = [
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE))
+    // Изтрий ВСИЧКИ стари кешове първо, после кеширай само иконите
+    caches.keys()
+      .then(keys => Promise.all(keys.map(key => caches.delete(key))))
+      .then(() => caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE)))
   );
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-      ))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener('fetch', event => {
