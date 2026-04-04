@@ -122,7 +122,7 @@ async function fetchRates() {
   const statusEl  = document.getElementById('rateStatus');
   const displayEl = document.getElementById('rateDisplay');
   try {
-    const res  = await fetch('https://api.frankfurter.app/latest?from=EUR&to=USD');
+    const res  = await fetch('https://api.frankfurter.app/latest?from=EUR&to=USD,BGN');
     if (!res.ok) throw new Error();
     const data = await res.json();
     eurToUsd = data.rates.USD;
@@ -131,7 +131,7 @@ async function fetchRates() {
     statusEl.className   = 'rate-badge live';
     displayEl.innerHTML  =
       `1 EUR = <b>${eurToBgn.toFixed(5)} BGN</b> &nbsp;|&nbsp; 1 EUR = <b>${eurToUsd.toFixed(4)} USD</b>` +
-      `<small>USD обновен: ${now}</small>`;
+      `<small>Актуален от: ${now}</small>`;
   } catch {
     statusEl.textContent = '🔴 USD не е актуален';
     statusEl.className   = 'rate-badge fixed';
