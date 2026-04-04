@@ -121,24 +121,45 @@ let eurToUsd = 1.08;      // ще се обнови от API
 async function fetchRates() {
   const statusEl  = document.getElementById('rateStatus');
   const displayEl = document.getElementById('rateDisplay');
-  try {
-    const res  = await fetch('https://api.frankfurter.app/latest?from=EUR&to=USD,BGN');
-    if (!res.ok) throw new Error();
-    const data = await res.json();
-    eurToUsd = data.rates.USD;
-    const now = new Date().toLocaleTimeString('bg-BG', { hour: '2-digit', minute: '2-digit' });
-    statusEl.textContent = '🟢 Актуален';
-    statusEl.className   = 'rate-badge live';
-    displayEl.innerHTML  =
-      `1 EUR = <b>${eurToBgn.toFixed(5)} BGN</b> &nbsp;|&nbsp; 1 EUR = <b>${eurToUsd.toFixed(4)} USD</b>` +
-      `<small>Актуален от: ${now}</small>`;
-  } catch {
-    statusEl.textContent = '🔴 USD не е актуален';
-    statusEl.className   = 'rate-badge fixed';
-    displayEl.innerHTML  =
-      `1 EUR = <b>${eurToBgn.toFixed(5)} BGN</b> &nbsp;|&nbsp; 1 EUR = <b>${eurToUsd.toFixed(4)} USD</b>` +
-      `<small>Няма връзка — използва се последен известен курс</small>`;
+
+  const apis = [
+    {
+      url:     'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/eur.json',
+      extract: d => d.eur.usd
+    },
+    {
+      url:     'https://api.exchangerate-api.com/v4/latest/EUR',
+      extract: d => d.rates.USD
+    },
+    {
+      url:     'https://corsproxy.io/?https://api.frankfurter.app/latest?from=EUR&to=USD,BGN',
+      extract: d => d.rates.USD
+    }
+  ];
+
+  for (const api of apis) {
+    try {
+      const res = await fetch(api.url);
+      if (!res.ok) continue;
+      const data = await res.json();
+      const usd  = api.extract(data);
+      if (!usd || isNaN(usd)) continue;
+      eurToUsd = usd;
+      const now = new Date().toLocaleTimeString('bg-BG', { hour: '2-digit', minute: '2-digit' });
+      statusEl.textContent = '🟢 Актуален';
+      statusEl.className   = 'rate-badge live';
+      displayEl.innerHTML  =
+        `1 EUR = <b>${eurToBgn.toFixed(5)} BGN</b> &nbsp;|&nbsp; 1 EUR = <b>${eurToUsd.toFixed(4)} USD</b>` +
+        `<small>Актуален от: ${now}</small>`;
+      return;
+    } catch { /* пробвай следващото */ }
   }
+
+  statusEl.textContent = '🔴 USD не е актуален';
+  statusEl.className   = 'rate-badge fixed';
+  displayEl.innerHTML  =
+    `1 EUR = <b>${eurToBgn.toFixed(5)} BGN</b> &nbsp;|&nbsp; 1 EUR = <b>${eurToUsd.toFixed(4)} USD</b>` +
+    `<small>Няма връзка — използва се последен известен курс</small>`;
 }
 
 function clearCurrency() {
